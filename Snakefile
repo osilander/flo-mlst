@@ -30,6 +30,12 @@ rule filter_sam:
     output: "results/{barcode}.{pcr}.mapped.bam"
     shell: "samtools view -bS -F 4 -h -bS {input.sam} > {output}"
 
+rule get_depth:
+    input:
+        sam="results/{barcode}.{pcr}.subset.sam"
+    output: "results/{barcode}.{pcr}.mapped.bam"
+    shell: "samtools view -bS -F 4 -h -bS {input.sam} > {output}"
+
 rule make_fastq:
     input:
         sam="results/{barcode}.{pcr}.mapped.bam"
