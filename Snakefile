@@ -9,7 +9,8 @@ PCR, = glob_wildcards("./data/{pcr}.fas")
 
 rule all:
     input:
-        expand("results/{barcode}.{pcr}.move", barcode=BC, pcr=PCR)
+        expand("results/{barcode}.{pcr}.move", barcode=BC, pcr=PCR),
+        expand("results/{barcode}.{pcr}.depth.txt", barcode=BC, pcr=PCR)
 
 rule trim_reads:
     input:
@@ -32,8 +33,8 @@ rule filter_sam:
 
 rule get_depth:
     input:
-        sam="results/{barcode}.{pcr}.subset.sam"
-    output: "results/{barcode}.{pcr}.mapped.bam"
+        sam="results/{barcode}.{pcr}.mapped.bam"
+    output: "results/{barcode}.{pcr}.depth.txt"
     shell: "samtools view -bS -F 4 -h -bS {input.sam} > {output}"
 
 rule make_fastq:
@@ -44,7 +45,7 @@ rule make_fastq:
 
 rule medaka:
     input:
-        reads="results/{barcode}.{pcr}.fastq",
+        reads="results/{barcode}.{pcr}.mapped.fastq",
         ref="data/{pcr}.fas"
     output: touch("results/{barcode}.{pcr}.medaka.polish.done")
     params:
@@ -75,3 +76,9 @@ rule multi_fasta:
         dir="results/medaka_{barcode}_{pcr}_polish",
         fasta="results/{pcr}.fas"
     shell: "cat {params.dir}/consensus.fasta >> {params.fasta}"
+
+#rule tree:
+#    input:
+        #fasta=expand(),
+#        fasta="results/{pcr}.fas"
+#    output: touch("results/{barcode}.{pcr}.move")
